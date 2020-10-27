@@ -1,5 +1,5 @@
 
-## Start me up!
+## Start me up! - exercise
 
 I am a pharmacist and I am doing a PhD at the **University of Eastern Finland**. I am working with register-based data on *Parkinson's disease*. I heard about this course from my colleague and I am looking forward to learn a lot about data sciences! I have only a little experience on coding. 
 
