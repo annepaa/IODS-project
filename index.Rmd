@@ -10,7 +10,7 @@ output:
     fig_height: 4
 ---
 
-***
+Author: "Anne Paakinaho"
 
 # Introduction to Open Data Science - Course Project
 

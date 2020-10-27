@@ -1,13 +1,13 @@
 
-# About the project
+## Start me up!
 
-*Write a short description about the course and add a link to your GitHub repository here. This is an R Markdown (.Rmd) file so you should use R Markdown syntax.*
+I am a pharmacist and I am doing a PhD at the **University of Eastern Finland**. I am working with register-based data on *Parkinson's disease*. I heard about this course from my colleague and I am looking forward to learn a lot about data sciences! I have only a little experience on coding. 
+
+Here is a link to my GitHub repository <https://github.com/annepaa/IODS-project.git>
+
 
 ```{r}
-# This is a so-called "R chunk" where you can write R code.
-
 date()
 
 ```
-The text continues here.
 
