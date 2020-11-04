@@ -1,5 +1,6 @@
 ---
 title: "IODS course project"
+author: "Anne Paakinaho"
 output:
   html_document:
     theme: cosmo
@@ -10,7 +11,7 @@ output:
     fig_height: 4
 ---
 
-Author: "Anne Paakinaho"
+
 
 # Introduction to Open Data Science - Course Project
 

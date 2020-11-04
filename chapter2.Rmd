@@ -1,13 +1,152 @@
-# Insert chapter 2 title here
+## RStudio exercise 2 
 
-*Describe the work you have done this week and summarize your learning.*
-
-- Describe your work and results clearly. 
-- Assume the reader has an introductory course level understanding of writing and reading R code as well as statistical methods.
-- Assume the reader has no previous knowledge of your data or the more advanced methods you are using.
+*Describe the work you have done this week and summarize your learning.*  
+I learned to do a folder 'data' and set working directories and of course how to read data into R and save data into folders.  
+Learning2014 is the data source that we are using in this exercise an it is based on a questionnaire that measures teaching and learning.
 
 ```{r}
 date()
 ```
+First I read the learning2014 data in. I use the one which has given to us. I finished the data wrangling part but I want to be sure that I use the right data for the analysis.
 
-Here we go again...
+```{r}
+learning2014<-read.delim('http://s3.amazonaws.com/assets.datacamp.com/production/course_2218/datasets/learning2014.txt',sep = ",")
+str(learning2014)
+dim(learning2014)
+head(learning2014)
+```
+It seems that learning2014 has 166 observations and 7 columns ("gender","age","attitude","deep","stra","surf","points").
+There are combination variables: deep, stra and surf which stand for questions for deep, strategic and surface learning.
+
+I start now plotting graphical overview of the data. First I take the summary graphics of the variables and then start plotting different variables with exam points.
+```{r}
+library(ggplot2)
+summary(learning2014)
+pairs(learning2014[-1])
+library(GGally)
+p <- ggpairs(learning2014, mapping = aes(col = gender, alpha = 0.3), lower = list(combo = wrap("facethist", bins = 20)))
+p
+```
+It can be seen from summary graphics that age range is 17-55 years, but there is more young people. The range of attitude, deep, stra and surf variables is roughly between 1 and 5 and exam points vary between 7-33 and the most frequent score is average, they seem to obey Gaussian curve.
+
+
+```{r}
+p1 <- ggplot(learning2014, aes(x = attitude, y = points, col=gender))
+p2 <- p1 + geom_point()
+p3 <- p2 + geom_smooth(method = "lm")
+p4 <- p3+ggtitle("Student's attitude versus exam points")
+p4
+```
+
+Among female,with lower attitude the exam points are quite average but among men lower attitude means a bit lower exam points. Although it seems that men have had generally higher score in attitude than women have had.
+And in both men and female, with high attitude usually the exam points are higher, but there are some exceptions.
+
+
+```{r}
+p4 <- ggplot(learning2014, aes(x = deep, y = points, col=gender))
+p5 <- p4 + geom_point()
+p6 <- p5 + geom_smooth(method = "lm")
+p7 <- p6+ggtitle("Student's questions related to deep learning versus exam points")
+p7
+```
+
+Women have a bit lower exam points than men in terms of deep learning dimension. However there is no clear result in general, average or high score in deep learning can lead to average or high exam points.
+```{r}
+p7 <- ggplot(learning2014, aes(x = stra, y = points, col=gender))
+p8 <- p7 + geom_point()
+p9 <- p8 + geom_smooth(method = "lm")
+p10 <- p9+ggtitle("Student's questions related to strategic learning versus exam points")
+p10
+```
+There is no clear result in exam points in terms of strategic learning dimension, the results in both men and women is scattered all over the picture.However, women seem to have lower exam points than men and there is slight curve upwards; with higher strategic learning scores student gets better exam points.
+
+```{r}
+p10 <- ggplot(learning2014, aes(x = surf, y = points, col=gender))
+p11 <- p10 + geom_point()
+p12 <- p11 + geom_smooth(method = "lm")
+p13 <- p12+ggtitle("Student's questions related to surface learning versus exam points")
+p13
+```
+Here lower scores in surface learning is associated with higher exam points, especially with men. Average score in surface learning can lead to any exam point, there is no clear pattern.
+
+
+I will do a multiple regression analysis and choose first three variables as explanatory variables: attitude, strategic and surface learning. Exam points is a dependent variable.
+First I do a plot matrix with ggpairs where I can see the correlation with exam points.
+
+
+```{r}
+ggpairs(learning2014, lower = list(combo = wrap("facethist", bins = 20)))
+```
+The highest correlation is with exam point is with attitude, strategic and surface learning.
+
+```{r}
+regression_model <- lm(points ~ attitude + stra+surf, data = learning2014)
+summary(regression_model)
+```
+Attitude is the only chosen explanatory variable that is statistically significantly related to exam points (P<0.05). I take the surf variable away and try  again.
+
+```{r}
+regression_model2 <- lm(points ~ attitude + stra, data = learning2014)
+summary(regression_model2)
+```
+Again, attitude dominates and stra is not statistically significant.
+
+I try the combination attitude+surf.
+```{r}
+regression_model3 <- lm(points ~ attitude + surf, data = learning2014)
+summary(regression_model3)
+```
+Again, attitude dominates and surf is not statistically significant.
+
+I try attitude with deep.
+
+```{r}
+regression_model4 <- lm(points ~ attitude + deep, data = learning2014)
+summary(regression_model4)
+```
+There is no relationship with deep either when attitude is with.
+
+I try now with different combinations, but I skip attitude.
+
+```{r}
+regression_model5 <- lm(points ~ age+deep+stra, data = learning2014)
+summary(regression_model5)
+```
+```{r}
+regression_model6 <- lm(points ~ deep+stra+surf, data = learning2014)
+summary(regression_model6)
+```
+```{r}
+regression_model7 <- lm(points ~ gender+deep+stra, data = learning2014)
+summary(regression_model7)
+```
+It seems difficult to find three variables that are all statistically significant. In the previous example without attitude, strategic learning was the only one that was at times statistically significant.
+
+I proceed with attitude and stra and interpret the result.
+
+```{r}
+regression_model8 <- lm(points ~ attitude+stra, data = learning2014)
+summary(regression_model8)
+```
+Residuals range is -17.6-10.9.
+The estimated regression coefficient for attitude (3.47) is statistically significa
+```nt (P-value <0.05) and is related to exam points. P-value of Stra's regression coefficient (0.91) is a bit over 0.05 (0.089). Standard errors for both attitude and stra are about the same, approx. 0.5. 
+Multiple R-squared is 0.2048, so together attitude and strategic learning account almost 20% of the variation in exam points.
+
+Let's now draw following diagnostic plots: Residuals vs Fitted values, Normal QQ-plot and Residuals vs Leverage.
+With par(mfrow = c(2,2)) we can have all the wanted plots in the same graph into 3 rows and 1 columns.
+
+
+```{r}
+par(mfrow = c(3,1))
+plot(regression_model8, which = c(1,2,5))
+```
+
+In residuals vs fitted values graph it can be seen that the dots are quite randomly spread. Residuals should not bring a problem to assumptions.
+
+QQplot of the residuals is a way of measuring the normality of errors. There is a good fit with the line so the residuals are normally distributed. 
+
+With Residuals vs Leverage graph can be estimated if one of the observations have unusually high impact on the model so we can detect outliers. Standardized residuals are quite same even if the leverage is higher.Points outside the Cook's distance have high influence, but here are no points beyond the Cook's distance.
+```{r}
+
+```
