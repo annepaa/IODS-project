@@ -134,11 +134,11 @@ The estimated regression coefficient for attitude (3.47) is statistically signif
 Multiple R-squared is 0.2048, so together attitude and strategic learning account almost 20% of the variation in exam points.
 
 Let's now draw following diagnostic plots: Residuals vs Fitted values, Normal QQ-plot and Residuals vs Leverage.
-With par(mfrow = c(2,2)) we can have all the wanted plots in the same graph into 3 rows and 1 columns.
+With par(mfrow = c(2,2)) we can have all the wanted plots in the same graph into 2 rows and 2 columns.
 
 
 ```{r}
-par(mfrow = c(3,1))
+par(mfrow = c(2,2))
 plot(regression_model8, which = c(1,2,5))
 ```
 
