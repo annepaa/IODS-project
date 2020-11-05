@@ -1,8 +1,8 @@
 ## RStudio exercise 2 
 
-*Describe the work you have done this week and summarize your learning.*  
 I learned to do a folder 'data' and set working directories and of course how to read data into R and save data into folders.  
 Learning2014 is the data source that we are using in this exercise an it is based on a questionnaire that measures teaching and learning.
+I learned how to do linear regression with R and produce different kinds of diagnostic plots to interpret the results.
 
 ```{r}
 date()
@@ -27,7 +27,8 @@ library(GGally)
 p <- ggpairs(learning2014, mapping = aes(col = gender, alpha = 0.3), lower = list(combo = wrap("facethist", bins = 20)))
 p
 ```
-It can be seen from summary graphics that age range is 17-55 years, but there is more young people. The range of attitude, deep, stra and surf variables is roughly between 1 and 5 and exam points vary between 7-33 and the most frequent score is average, they seem to obey Gaussian curve.
+  
+It can be seen from summary graphics that age range is 17-55 years, but there is more young people. The range of attitude, deep, stra and surf variables is roughly between 1 and 5 and exam points vary between 7-33. Results seem to obey Gaussian curve, since average points seem to be more frequent than low or high results.
 
 
 ```{r}
@@ -58,7 +59,8 @@ p9 <- p8 + geom_smooth(method = "lm")
 p10 <- p9+ggtitle("Student's questions related to strategic learning versus exam points")
 p10
 ```
-There is no clear result in exam points in terms of strategic learning dimension, the results in both men and women is scattered all over the picture.However, women seem to have lower exam points than men and there is slight curve upwards; with higher strategic learning scores student gets better exam points.
+  
+There is no clear result in exam points in terms of strategic learning dimension, the results in both men and women is scattered all over the picture.However, women seem to have lower exam points than men and there is a slight curve upwards; with higher strategic learning scores student gets better exam points.
 
 ```{r}
 p10 <- ggplot(learning2014, aes(x = surf, y = points, col=gender))
@@ -67,17 +69,19 @@ p12 <- p11 + geom_smooth(method = "lm")
 p13 <- p12+ggtitle("Student's questions related to surface learning versus exam points")
 p13
 ```
+
 Here lower scores in surface learning is associated with higher exam points, especially with men. Average score in surface learning can lead to any exam point, there is no clear pattern.
 
 
-I will do a multiple regression analysis and choose first three variables as explanatory variables: attitude, strategic and surface learning. Exam points is a dependent variable.
+Let's do a multiple regression analysis and choose three variables as explanatory variables: attitude, strategic and surface learning. Exam points is a dependent variable.
 First I do a plot matrix with ggpairs where I can see the correlation with exam points.
-
+  
 
 ```{r}
 ggpairs(learning2014, lower = list(combo = wrap("facethist", bins = 20)))
 ```
-The highest correlation is with exam point is with attitude, strategic and surface learning.
+
+The highest correlation with exam point is with attitude, strategic and surface learning.
 
 ```{r}
 regression_model <- lm(points ~ attitude + stra+surf, data = learning2014)
@@ -128,10 +132,9 @@ I proceed with attitude and stra and interpret the result.
 regression_model8 <- lm(points ~ attitude+stra, data = learning2014)
 summary(regression_model8)
 ```
-Residuals range is -17.6-10.9.
-The estimated regression coefficient for attitude (3.47) is statistically significa
-```nt (P-value <0.05) and is related to exam points. P-value of Stra's regression coefficient (0.91) is a bit over 0.05 (0.089). Standard errors for both attitude and stra are about the same, approx. 0.5. 
-Multiple R-squared is 0.2048, so together attitude and strategic learning account almost 20% of the variation in exam points.
+Residuals range between -17.6-10.9.
+The estimated regression coefficient for attitude (3.47) is statistically significant (P-value <0.05) and is related to exam points. P-value of Stra's regression coefficient (0.91) is a bit over 0.05 (0.089). Standard errors for both attitude and stra are about the same, approx. 0.5. 
+Multiple R-squared is 0.2048, so together attitude and strategic learning account almost 20% of the variation in exam points. I believe that is not very much.
 
 Let's now draw following diagnostic plots: Residuals vs Fitted values, Normal QQ-plot and Residuals vs Leverage.
 With par(mfrow = c(2,2)) we can have all the wanted plots in the same graph into 2 rows and 2 columns.
