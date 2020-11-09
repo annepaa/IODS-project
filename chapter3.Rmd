@@ -10,3 +10,96 @@ output: html_document
 date()
 ```
 
+In exercise 3 the idea is to learn about logistic regression.
+The joined data set used in the analysis exercise combines the two student alcohol consumption data sets.
+More information about the dataset and the variables can be found here: <https://archive.ics.uci.edu/ml/datasets/Student+Performance>
+Here is the paper, where the data was originally used: <http://www3.dsi.uminho.pt/pcortez/student.pdf>
+
+I will read the joined alcohol consumption into R from the following link: <https://github.com/rsund/IODS-project/raw/master/data/alc.csv>
+
+```{r}
+alc <- readr::read_csv("https://github.com/rsund/IODS-project/raw/master/data/alc.csv")
+dim(alc)
+str(alc)
+colnames(alc)
+```
+Alc data contains 370 observations and 51 variables.
+The following adjustments have been made: The variables not used for joining the two data have been combined by averaging (including the grade variables) 'alc_use' is the average of 'Dalc' (workday alcohol consumption) and 'Walc'(weekend alcohol consumption), 'high_use' is TRUE if 'alc_use' is higher than 2 and FALSE otherwise.
+
+The purpose of this analysis is to study the relationships between high/low alcohol consumption. I choose the following four variables and check their relationships with alcohol consumption (variable high_use): age, .
+
+I do box plots of those variables to display and compare distributions.  
+**Age**
+```{r}
+library(ggplot2)
+g1 <- ggplot(alc, aes(x = high_use, y = age, col = sex))
+g1 + geom_boxplot() + ylab("age")
+
+```
+```{r}
+# produce summary statistics by group
+library(dplyr); library(ggplot2)
+alc %>% group_by(sex, high_use) %>% summarise(count = n(), mean_age = mean(age))
+```
+```{r}
+g6 <- ggplot(data = alc, aes(x = age,col=sex))
+g6 + geom_bar()
+
+```
+
+
+**absences (number of school absences)**
+```{r}
+g2 <- ggplot(alc, aes(x = high_use, y = absences, col = sex))
+g2 + geom_boxplot() + ylab("absences")
+
+```
+```{r}
+g6 <- ggplot(data = alc, aes(x = absences,col=sex))
+g6 + geom_bar()
+
+```
+
+**famrel (quality of family relationships)**
+```{r}
+g3 <- ggplot(alc, aes(x = high_use, y = famrel, col = sex))
+g3 + geom_boxplot() + ylab("famrel")
+
+```
+
+```{r}
+g6 <- ggplot(data = alc, aes(x = famrel,col=sex))
+g6 + geom_bar()
+
+```
+**freetime (free time after school)**
+```{r}
+g4 <- ggplot(alc, aes(x = high_use, y = freetime, col = sex))
+g4 + geom_boxplot() + ylab("freetime")
+
+```
+
+```{r}
+g8 <- ggplot(data = alc, aes(x = freetime,col=sex))
+g8 + geom_bar()
+
+```
+
+**absences (number of school absences)**
+```{r}
+g5 <- ggplot(data = alc, aes(x = absences,col=sex))
+g5 + geom_bar()
+
+```
+
+```{r}
+g8 <- ggplot(data = alc, aes(x = absences,col=sex))
+g8 + geom_bar()
+
+```
+
+
+
+
+
+

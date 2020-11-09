@@ -80,6 +80,7 @@ colnames(pormath)
 #save the file to data folder.
 write.csv(pormath,"C:/Users/silve/OneDrive - University of Eastern Finland/IODS-project 2020/IODS-project/data/pormath.csv")
 
+#it might be that after this, I am doing something wrong
 
 #joined columns; these variables are the ones that we want to use in this exercise.
 join_by <- c("school","sex","age","address","famsize","Pstatus","Medu","Fedu","Mjob","Fjob","reason","nursery","internet")
