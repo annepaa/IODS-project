@@ -128,5 +128,15 @@ g2 <- ggplot(alc, aes(high_use))
 # draw a bar plot of high_use by sex
 g2 + facet_wrap("sex") + geom_bar()
 
+library(tidyr)
+glimpse(alc)
+#there is 370 rows and 35 columns, it should be right. Having 384 rows would erroneous as it was said to us.
 
+# use gather() to gather columns into key-value pairs and then glimpse() at the resulting data
+gather(alc) %>% glimpse
+# draw a bar plot of each variable
+gather(alc) %>% ggplot(aes(value)) + facet_wrap("key", scales = "free") + geom_bar()
+
+#save 'alc' to data folder.
+write.csv(alc,"C:/Users/silve/OneDrive - University of Eastern Finland/IODS-project 2020/IODS-project/data/alc.csv")
 
