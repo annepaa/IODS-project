@@ -1,0 +1,12 @@
+---
+title: "chapter3"
+author: "Anne Paakinaho"
+date: "9 11 2020"
+output: html_document
+---
+## RStudio exercise 3: Logistic regression
+
+```{r}
+date()
+```
+

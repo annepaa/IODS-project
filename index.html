@@ -438,6 +438,7 @@ summary {
 <li><a href="#introduction-to-open-data-science---course-project">Introduction to Open Data Science - Course Project</a><ul>
 <li><a href="#start-me-up---exercise">Start me up! - exercise</a></li>
 <li><a href="#rstudio-exercise-2">RStudio exercise 2</a></li>
+<li><a href="#rstudio-exercise-3-logistic-regression">RStudio exercise 3: Logistic regression</a></li>
 </ul></li>
 </ul>
 </div>
@@ -449,7 +450,7 @@ summary {
 <p>I am a pharmacist and I am doing a PhD at the <strong>University of Eastern Finland</strong>. I am working with register-based data on <em>Parkinson’s disease</em>. I heard about this course from my colleague and I am looking forward to learn a lot about data sciences! I have only a little experience on coding.</p>
 <p>Here is a link to my GitHub repository <a href="https://github.com/annepaa/IODS-project.git" class="uri">https://github.com/annepaa/IODS-project.git</a></p>
 <pre class="r"><code>date()</code></pre>
-<pre><code>## [1] &quot;Thu Nov 05 12:03:35 2020&quot;</code></pre>
+<pre><code>## [1] &quot;Mon Nov 09 13:45:36 2020&quot;</code></pre>
 <hr />
 </div>
 <div id="rstudio-exercise-2" class="section level2">
@@ -457,7 +458,7 @@ summary {
 <p>I learned to do a folder ‘data’ and set working directories and of course how to read data into R and save data into folders.<br />
 Learning2014 is the data source that we are using in this exercise an it is based on a questionnaire that measures teaching and learning. I learned how to do linear regression with R and produce different kinds of diagnostic plots to interpret the results.</p>
 <pre class="r"><code>date()</code></pre>
-<pre><code>## [1] &quot;Thu Nov 05 12:03:35 2020&quot;</code></pre>
+<pre><code>## [1] &quot;Mon Nov 09 13:45:37 2020&quot;</code></pre>
 <p>First I read the learning2014 data in. I use the one which has given to us. I finished the data wrangling part but I want to be sure that I use the right data for the analysis.</p>
 <pre class="r"><code>learning2014&lt;-read.delim(&#39;http://s3.amazonaws.com/assets.datacamp.com/production/course_2218/datasets/learning2014.txt&#39;,sep = &quot;,&quot;)
 str(learning2014)</code></pre>
@@ -733,7 +734,12 @@ plot(regression_model8, which = c(1,2,5))</code></pre>
 <p>QQplot of the residuals is a way of measuring the normality of errors. There is a good fit with the line so the residuals are normally distributed.</p>
 <p>With Residuals vs Leverage graph can be estimated if one of the observations have unusually high impact on the model so we can detect outliers. Standardized residuals are quite same even if the leverage is higher.Points outside the Cook’s distance have high influence, but here are no points beyond the Cook’s distance.</p>
 <hr />
-<p>(more chapters to be added similarly as we proceed with the course!)</p>
+</div>
+<div id="rstudio-exercise-3-logistic-regression" class="section level2">
+<h2>RStudio exercise 3: Logistic regression</h2>
+<pre class="r"><code>date()</code></pre>
+<pre><code>## [1] &quot;Mon Nov 09 13:46:12 2020&quot;</code></pre>
+<hr />
 </div>
 </div>
 
