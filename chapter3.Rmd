@@ -184,7 +184,8 @@ cv$delta[1]
 I guess the error here is 0.3 so it is more than the model that was introduced in DataCamp.
 
 
-**Learning diary**
+**Learning diary**  
+
 So far, I have learned a lot how RStudio works and how you have to handle the data to get some results.  
 It has surprised me that R uses different kind of packages to work.  
 It would be very helpful if we would first get a real lecture how to interpret the results. DataCamp in not helpful enough and neither is the Kimmo's book (although it is a good book :) ). Now with the time I have, I just do my best to finish the exercises somehow but what would really like to learn is to interpret the results, not just how thing are done mechanically. But anyway, I still have learned new thing about logistic regression, so I am looking forward what to learn next.
