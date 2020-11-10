@@ -420,7 +420,7 @@ summary {
 <div id="rstudio-exercise-3-logistic-regression" class="section level2">
 <h2>RStudio exercise 3: Logistic regression</h2>
 <pre class="r"><code>date()</code></pre>
-<pre><code>## [1] &quot;Tue Nov 10 15:36:04 2020&quot;</code></pre>
+<pre><code>## [1] &quot;Tue Nov 10 15:47:58 2020&quot;</code></pre>
 <p>In exercise 3 the idea is to learn about logistic regression. The joined data set used in the analysis exercise combines the two student alcohol consumption data sets. More information about the dataset and the variables can be found here: <a href="https://archive.ics.uci.edu/ml/datasets/Student+Performance" class="uri">https://archive.ics.uci.edu/ml/datasets/Student+Performance</a> Here is the paper, where the data was originally used: <a href="http://www3.dsi.uminho.pt/pcortez/student.pdf" class="uri">http://www3.dsi.uminho.pt/pcortez/student.pdf</a></p>
 <p>I will read the joined alcohol consumption into R from the following link: <a href="https://github.com/rsund/IODS-project/raw/master/data/alc.csv" class="uri">https://github.com/rsund/IODS-project/raw/master/data/alc.csv</a></p>
 <pre class="r"><code>alc &lt;- readr::read_csv(&quot;https://github.com/rsund/IODS-project/raw/master/data/alc.csv&quot;)</code></pre>
@@ -751,9 +751,10 @@ cv &lt;- cv.glm(data = alc, cost = loss_func, glmfit = model1, K = 10)
 
 # average number of wrong predictions in the cross validation
 cv$delta[1]</code></pre>
-<pre><code>## [1] 0.3027027</code></pre>
+<pre><code>## [1] 0.3054054</code></pre>
 <p>I guess the error here is 0.3 so it is more than the model that was introduced in DataCamp.</p>
-<p><strong>Learning diary</strong> So far, I have learned a lot how RStudio works and how you have to handle the data to get some results.<br />
+<p><strong>Learning diary</strong></p>
+<p>So far, I have learned a lot how RStudio works and how you have to handle the data to get some results.<br />
 It has surprised me that R uses different kind of packages to work.<br />
 It would be very helpful if we would first get a real lecture how to interpret the results. DataCamp in not helpful enough and neither is the Kimmo’s book (although it is a good book :) ). Now with the time I have, I just do my best to finish the exercises somehow but what would really like to learn is to interpret the results, not just how thing are done mechanically. But anyway, I still have learned new thing about logistic regression, so I am looking forward what to learn next.</p>
 </div>
