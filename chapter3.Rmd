@@ -22,84 +22,172 @@ alc <- readr::read_csv("https://github.com/rsund/IODS-project/raw/master/data/al
 dim(alc)
 str(alc)
 colnames(alc)
+
 ```
 Alc data contains 370 observations and 51 variables.
 The following adjustments have been made: The variables not used for joining the two data have been combined by averaging (including the grade variables) 'alc_use' is the average of 'Dalc' (workday alcohol consumption) and 'Walc'(weekend alcohol consumption), 'high_use' is TRUE if 'alc_use' is higher than 2 and FALSE otherwise.
 
-The purpose of this analysis is to study the relationships between high/low alcohol consumption. I choose the following four variables and check their relationships with alcohol consumption (variable high_use): age, .
+The purpose of this analysis is to study the relationships between high/low alcohol consumption. I choose the following four variables and check their relationships with alcohol consumption (variable high_use): age, school absences, family relationship, and freetime after school. I hypothesize that older students use more alcohol than younger ones, those who have more school absences have higher use of alcohol consumption. Those who have bad family relationships use more alcohol. Then in terms of freetime, I think it could be either or. Those who have more free time have more time to drink but then on the other hand those who have less free time might be more stressed. But because there is quite young students in this data, I assume that those who have less free time spend more time with homework, hobbies and with their families so they also drink less alcohol.
 
 I do box plots of those variables to display and compare distributions.  
+
 **Age**
 ```{r}
-library(ggplot2)
-g1 <- ggplot(alc, aes(x = high_use, y = age, col = sex))
-g1 + geom_boxplot() + ylab("age")
-
-```
-```{r}
-# produce summary statistics by group
 library(dplyr); library(ggplot2)
-alc %>% group_by(sex, high_use) %>% summarise(count = n(), mean_age = mean(age))
+summary(alc$age)
+g1 <- ggplot(alc, aes(x = high_use, y = age, col = sex))
+g1 + geom_boxplot() + ylab("age") +ggtitle("Student age by high alcohol use and sex")
+
 ```
+Age varies between 15-22 years in men and women, mean age is 16.6. Male students who have high alcohol consumption tend to be roughly one year older (mean age 17) than those who have lower alcohol consumption (mean age 16). There is no difference with women. My hypothesis was partially correct, only with men.  
+There are some outliers, i.e. values outside the whiskers.
+
+
+
 ```{r}
-g6 <- ggplot(data = alc, aes(x = age,col=sex))
-g6 + geom_bar()
+g2 <- ggplot(data = alc, aes(x = age,col=sex))
+g2 + geom_bar()
 
 ```
-
+It can be seen also from this plot that the outliers compose of a couple of persons who are over 18 years-old. 
 
 **absences (number of school absences)**
 ```{r}
-g2 <- ggplot(alc, aes(x = high_use, y = absences, col = sex))
-g2 + geom_boxplot() + ylab("absences")
+summary(alc$absences)
+g3 <- ggplot(alc, aes(x = high_use, y = absences, col = sex))
+g3 + geom_boxplot() + ylab("absences")+ggtitle("Student school absencec by high alcohol use and sex")
 
+g4 <- ggplot(data = alc, aes(x = absences,col=sex))
+g4 + geom_bar()
 ```
-```{r}
-g6 <- ggplot(data = alc, aes(x = absences,col=sex))
-g6 + geom_bar()
+Number of school absences vary between 0-45, mean value is 4.5 as can be seen also from the box plot. Both men and women who use more alcohol have a bit more school absences. Those who have the highest amount of absences are women.
+I hypothesized that those with high amount of school absences would drink more but I would have waited a clearer difference.
 
-```
 
 **famrel (quality of family relationships)**
 ```{r}
-g3 <- ggplot(alc, aes(x = high_use, y = famrel, col = sex))
-g3 + geom_boxplot() + ylab("famrel")
-
-```
-
-```{r}
+summary(alc$famrel)
+g5 <- ggplot(alc, aes(x = high_use, y = famrel, col = sex))
+g5 + geom_boxplot() + ylab("famrel") +ggtitle("Student family relationship by high alcohol use and sex")
 g6 <- ggplot(data = alc, aes(x = famrel,col=sex))
 g6 + geom_bar()
 
 ```
+Quality of family relationships vareis between 1-5, mean value is 3.9.
+It is quite obvious to see from the box plot that both women and men use more alcohol if they have had lower score in quality of family relationship, so my hypothesis was correct.
+Mot men and women have somewhat equal score distribution, for example both sexes have had good score (5) in family relationship, not only women or vise verse. 
+
 **freetime (free time after school)**
 ```{r}
-g4 <- ggplot(alc, aes(x = high_use, y = freetime, col = sex))
-g4 + geom_boxplot() + ylab("freetime")
-
-```
-
-```{r}
+summary(alc$freetime)
+g7 <- ggplot(alc, aes(x = high_use, y = freetime, col = sex))
+g7 + geom_boxplot() + ylab("freetime")+ggtitle("Student freetime after school by high alcohol use and sex")
 g8 <- ggplot(data = alc, aes(x = freetime,col=sex))
 g8 + geom_bar()
-
 ```
+Students free time after school varies between 1-5 and mean value is 3.2.
+Women who have more free time use a bit more alcohol than those women who have less free time after school. With men there is no difference. 
+Men seem to have more high scores in freetime, so men have more freetime after school than women.
+Distribution is quite equal so at this point I am not sure about my hypothesis, because men seem to drink or not drink regardless of their free time. 
 
-**absences (number of school absences)**
+
+**Logistic regression**  
+I will now do a logistic regression to explore the relationship with the for variables (age, absences, famrel and freetime) with binary high/low alcohol consumption variable (high_use).
+
+
 ```{r}
-g5 <- ggplot(data = alc, aes(x = absences,col=sex))
-g5 + geom_bar()
+model1 <- glm(high_use ~ age + absences + famrel + freetime, data = alc, family = "binomial")
+summary(model1)
+coef(model1) #prints out only the coefficients
+```
+Deviance residuals, min and max should be about the same distance from zero and likewise 1Q and 3Q abut the same from zero if the model fits well. These look good, they are close to zero and quite symmetrical.  
+
+Here scale of the coefficients is log(odds). The first intercept is the expected mean value of Y when all X=0. The other intercepts are the slopes. I believe, that for every unit of change in high_use, the log(odds of abcences for example) increases by 0.08. Wald test produces Standard error and z value and finally P-value. All the other explanatory variables other than age are statistically significant (P<0.05) and their ORs and confidence intervals should be significant. Age is not useful predictor for alcohol use and I should drop it. I guess because most of the people were very young, age doesn't matter.  
+
+Deviance measures how closely the model-based fitted values of the response estimates the observed values and it is a measure of fit. The null deviance given is for a model with no explanatory variables, and the residual deviance is that for a model with explanatory variables. The deviance can be used to compare different models.  
+AIC=Akaike Information Criterion, is Residual deviance adjusted for the number of parameters in the model. AIC can also me used to compare models to another.
+
+(The following YouTube video help me to interpret the results <https://www.youtube.com/watch?v=C4N3_XJJ-jU> )
+
+
+**Odds ratios (OR)**  
+I compute Odds ratios (ORs) and confidence intervals (CIs)
+```{r}
+OR <- coef(model1) %>% exp
+CI <- confint(model1) %>% exp
+cbind(OR, CI)
+```
+As I assumed due to P-values, the OR for age is not significant because the confidence intervals contain number 1. Otherwise amount of absences and more freetime are associated with increased alcohol use, and good family relationship with decreased alcohol use. My assumptions in the beginning where correct except I had thought that the age would matter but it didn't.
+
+I will now continue and make predictions. I drop age from the chosen variables because it was not significant.
+
+**Predictive power**
+```{r}
+# predict() the probability of high_use
+probabilities <- predict(model1, type = "response")
+alc <- mutate(alc, probability = probabilities)
+# use the probabilities to make a prediction of high_use
+alc <- mutate(alc, prediction = probability > 0.5)
+# see the last ten original classes, predicted probabilities, and class predictions
+select(alc, absences,famrel,freetime,high_use, probability, prediction) %>% tail(10)
+# tabulate the target variable versus the predictions
+table(high_use = alc$high_use, prediction = alc$prediction)
+summary(alc$high_use)
 
 ```
+I am not sure how to interpret the 2x2 cross tabulation, but I guess that there were in total 240+19=259 persons who did not use very much alcohol and 92+19=111 persons who used a lot of alcohol. Of those 259 persons who were FALSE, the model predicted to be TRUE, so not all were correct. And for some reason for those 111 persons who drank a lot, 92 were predicted to actually to be in FALSE category meaning they don't drink a lot. So the model does not predict very well persons who use lot of alcohol(?).
+
+**Let's plot more**
+```{r}
+# initialize a plot of 'high_use' versus 'probability' in 'alc'
+g <- ggplot(alc, aes(x = probability, y = high_use, col = prediction))
+g + geom_point()
+table(high_use = alc$high_use, prediction = alc$prediction) %>% prop.table %>% addmargins
+
+```
+As can be seen from plot and from the prediction table, category FALSE compose 70% of the high_use (0.7) and TRUE 30% (0.3). Model can predict FALSE right with 65% accuracy and TRUE with 5% accuracy (?).
+
+**Computing the average number of incorrect predictions**
 
 ```{r}
-g8 <- ggplot(data = alc, aes(x = absences,col=sex))
-g8 + geom_bar()
-
+# define a loss function (average prediction error)
+loss_func <- function(class, prob) {
+  n_wrong <- abs(class - prob) > 0.5
+  mean(n_wrong)
+}
+# the average number of wrong predictions in the alc data
+loss_func(class = alc$high_use, prob = 0)
+loss_func(class = alc$high_use, prob = 1)
+loss_func(class = alc$high_use, prob = alc$probability)
 ```
+I am not sure how to interpret this either... but this gives me the same numbers: If the probability is 0, then high_use is 0 for all (meaning low alcohol use) and then average percentage of wrong predictions is 30% (?)
+Probability 1 means that high_use is 1 i.e. high alcohol use for all and then average percentage of wrong predictions is 70%(?). Perhaps the probability here refers to the penalty, here it is 30%.  
+
+I will try to do the cross-validation:
+```{r}
+# define a loss function (average prediction error)
+loss_func <- function(class, prob) {
+  n_wrong <- abs(class - prob) > 0.5
+  mean(n_wrong)
+}
+
+# compute the average number of wrong predictions in the (training) data
+loss_func(class = alc$high_use, prob = alc$probability)
+
+# K-fold cross-validation
+library(boot)
+cv <- cv.glm(data = alc, cost = loss_func, glmfit = model1, K = 10)
+
+# average number of wrong predictions in the cross validation
+cv$delta[1]
+```
+I guess the error here is 0.3 so it is more than the model that was introduced in DataCamp.
 
 
-
+**Learning diary**
+So far, I have learned a lot how RStudio works and how you have to handle the data to get some results.  
+It has surprised me that R uses different kind of packages to work.  
+It would be very helpful if we would first get a real lecture how to interpret the results. DataCamp in not helpful enough and neither is the Kimmo's book (although it is a good book :) ). Now with the time I have, I just do my best to finish the exercises somehow but what would really like to learn is to interpret the results, not just how thing are done mechanically. But anyway, I still have learned new thing about logistic regression, so I am looking forward what to learn next.
 
 
 
