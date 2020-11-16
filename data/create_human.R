@@ -25,17 +25,21 @@ colnames(gii)
 #I should rename the variables, but I don't know yet how should I rename them.
 
 #creating new variables
-gii$var1 <- gii$Population.with.Secondary.Education..Female./gii$Population.with.Secondary.Education..Male.
+var1 <- gii$Population.with.Secondary.Education..Female./gii$Population.with.Secondary.Education..Male.
+var1
 
 #the second one...
-
-gii$var2<-gii$Labour.Force.Participation.Rate..Female./gii$Labour.Force.Participation.Rate..Male.
+var2<-gii$Labour.Force.Participation.Rate..Female./gii$Labour.Force.Participation.Rate..Male.
 summary(gii$var2)
+var2
+
 #by country???
+country<-c(gii$Country)
+country
 
 #merge
+human <- inner_join(var1, var2, by=country)
 
-combo <- merge(x=gii$var1,y=gii$var2,by="country")
-combo= gii$var1 %>% inner_join(gii$var2,by="country")
+human
 
-#I have no idea how to do this...
+#I have no idea how to do this, that did not work...
