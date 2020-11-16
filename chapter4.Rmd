@@ -1,0 +1,213 @@
+---
+title: "chapter4"
+author: "Anne Paakinaho"
+date: "16 11 2020"
+output: html_document
+---
+## RStudio exercise 4: clustering and classification
+
+```{r}
+date()
+```
+
+I will access MASS library to download the Boston data, that is used in exercise 4.  
+I will explore the structure of the data and describe the content.
+
+```{r}
+library(MASS)
+data("Boston")
+str(Boston) #structure
+summary(Boston)
+dim(Boston) #dimensions
+
+```
+The Boston data contains 506 observations and 14 columns. All the variables are numeric. The data describes "Housing Values in Suburbs of Boston".  
+You can read more about the Boston data here <https://stat.ethz.ch/R-manual/R-devel/library/MASS/html/Boston.html>
+Among other things, the data contains information on per capita crime rate, average number of rooms per dwelling and so on.  
+Variables have very different ranges and they are not comparable with each other. For example, variable crim varies between 0.00632-88.97620 and black 0.32-396.90.
+
+Distributions of the variables are plotted below:
+
+```{r}
+pairs(Boston) #plot matrix
+
+```
+
+Let's do correlation plots:
+```{r}
+library("corrplot")
+library("dplyr")
+#calculate the correlation matrix and round it
+cor_matrix<-cor(Boston) %>% round(digits=2)
+#printing correlation matrix
+cor_matrix
+#visualizing
+corrplot(cor_matrix, method="circle", type="upper", cl.pos="b", tl.pos="d", tl.cex = 0.6)
+
+```
+  
+Correlation matrix lists all the correlations between variables in numbers, so if you are interested of knowing some specific correlation you can easily check it from the table.  
+However, the corrlot option gives more visual way to check it out. You can see the strength of the correlation by checking the colors and the scaling below. 
+For example, correlation between crim (per capita crime rate by town) and zn (proportion of residential land zoned for lots over 25,000 sq.ft) is -0.2. Overall, there is both strong positive (blue color) and negative (red color) correlation between variables.
+
+
+Let's scale the dataset. In the scaling we subtract the column means from the corresponding columns and divide the difference with standard deviation (SD) as said in the DataCamp.
+```{r}
+#scaling
+boston_scaled <- scale(Boston)
+summary(boston_scaled)
+class(boston_scaled)
+#I want the data to be in a data frame
+boston_scaled<-as.data.frame(boston_scaled)
+```
+
+When I did the scaling, all the means turned out be a zero (mean column-mean(x)=0 and 0/SD=0). 
+I turned the data into a data frame.
+
+I will do now a categorical variable of the crime rate (variable crim).
+
+```{r}
+summary(boston_scaled$crim)
+# create a quantile vector of crim and print it
+bins <- quantile(boston_scaled$crim)
+bins #there are same values here but e.g. instead of min it shows 0%
+#I will use the quantiles as break points when I do the categorical variable 'crime'
+crime <- cut(boston_scaled$crim, breaks = bins, include.lowest = TRUE, labels = c("low", "med_low", "med_high", "high"))
+table(crime) #labels corresponds the quantiles
+
+# remove original crim from the dataset
+boston_scaled <- dplyr::select(boston_scaled, -crim)
+
+# add the new categorical value to scaled data
+boston_scaled <- data.frame(boston_scaled, crime)
+
+```
+
+I dropped the old variable crim and added the new factor variable crime to the boston_scaled dataset.  
+
+Now I want to divide the dataset to train and test sets, so that 80% of the data belongs to the train set. With splitting, I can test how the model works in prediction.
+
+```{r}
+# number of rows in the Boston dataset 
+n <- nrow(boston_scaled)
+n
+# choose randomly 80% of the rows
+ind <- sample(n,  size = n * 0.8)
+# create train set 
+train <- boston_scaled[ind,] # 80% of the data is in train set
+
+# create test set 
+test <- boston_scaled[-ind,] # 20% of the data is in test set
+```
+  
+Fitting the linear discriminant analysis (LDA) on the train set. LDA is a classification method.
+The target variable in LDA needs to be categorical, so crime rate (we made it into categorical before) is the target variable and all the other variables are predictors.  
+LDA is based on assumptions that variables are normally distributed and each variable has the same variance. I did the scaling to the variables so this should be OK.
+```{r}
+lda.fit <- lda(crime ~ ., data = train)
+lda.fit
+```
+  
+Prior probabilities of group: number of observations in the group divided by number of observations in the whole dataset.
+Group means: Mean value for every variable and class
+
+Proportion of trace is the between groups variance, here LD1 94% explains the between groups variance.
+
+I will draw the LDA biplot.
+```{r}
+# the function for lda biplot arrows
+lda.arrows <- function(x, myscale = 1, arrow_heads = 0.1, color = "orange", tex = 0.75, choices = c(1,2)){
+  heads <- coef(x)
+  arrows(x0 = 0, y0 = 0, 
+         x1 = myscale * heads[,choices[1]], 
+         y1 = myscale * heads[,choices[2]], col=color, length = arrow_heads)
+  text(myscale * heads[,choices], labels = row.names(heads), 
+       cex = tex, col=color, pos=3)
+}
+
+# target classes as numeric
+classes <- as.numeric(train$crime)
+
+# plot the lda results
+plot(lda.fit, dimen = 2, col = classes, pch = classes)
+lda.arrows(lda.fit, myscale = 1)
+
+```
+  
+The arrows are drawn based on the coefficients.
+
+
+I will save the crime categories from the test set and then remove the categorical crime variable from the test dataset.  
+```{r}
+# save the correct classes from test data
+correct_classes <- test$crime
+# remove the crime variable from test data
+test <- dplyr::select(test, -crime)
+```
+  
+Now I will predict the classes with the LDA model on the test data.
+
+```{r}
+# predict classes with test data
+lda.pred <- predict(lda.fit, newdata = test)
+# cross tabulate the results
+table(correct = correct_classes, predicted = lda.pred$class)
+```
+  
+If I interpret this in a right way, the model can predict very well the high crime rates. But in low, med low and med high there is some misclassification. For example, 6 of the in total of 19 low crime rates is classified into med low, which is incorrect. All 19 should be predicted into low, if the model would work without any errors.  
+
+
+Now I should reload the Boston dataset and standardize/scale it.  
+I will calculate the distances (Euclidean and Manhattan) between observations.
+
+```{r}
+data("Boston")
+boston_scaled2 <- scale(Boston) #scaling
+# euclidean distance matrix
+dist_eu <- dist(boston_scaled2)
+summary(dist_eu)
+
+# manhattan distance matrix
+dist_man <- dist(boston_scaled2, method = 'manhattan')
+
+# look at the summary of the distances
+summary(dist_man)
+
+```
+
+K-means is a clustering method. "It is an unsupervised method, that assigns observations to groups or clusters based on similarity of the objects."
+
+
+```{r}
+# k-means clustering
+km <-kmeans(boston_scaled2, centers = 3)
+# plot the scaled boston dataset with clusters
+pairs(boston_scaled2, col = km$cluster)
+
+```
+
+Finding the best number of clusters:
+
+```{r}
+library(ggplot2)
+set.seed(123)
+# determine the number of clusters
+k_max <- 10
+
+# calculate the total within sum of squares
+twcss <- sapply(1:k_max, function(k){kmeans(boston_scaled2, k)$tot.withinss})
+
+# visualize the results
+qplot(x = 1:k_max, y = twcss, geom = 'line')
+
+# k-means clustering
+km <-kmeans(Boston, centers = 2)
+
+# plot the Boston dataset with clusters
+pairs(Boston, col = km$cluster)
+````
+
+Optimal number of clusters seems to be 2, because there the total within cluster sum of squares (WCSS) changes radically.
+
+
+
