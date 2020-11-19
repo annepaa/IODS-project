@@ -30,6 +30,9 @@ Distributions of the variables are plotted below:
 
 ```{r}
 pairs(Boston) #plot matrix
+library(ggplot2)
+library(GGally)
+ggpairs(Boston)
 
 ```
 
@@ -46,9 +49,9 @@ corrplot(cor_matrix, method="circle", type="upper", cl.pos="b", tl.pos="d", tl.c
 
 ```
   
-Correlation matrix lists all the correlations between variables in numbers, so if you are interested of knowing some specific correlation you can easily check it from the table.  
-However, the corrlot option gives more visual way to check it out. You can see the strength of the correlation by checking the colors and the scaling below. 
-For example, correlation between crim (per capita crime rate by town) and zn (proportion of residential land zoned for lots over 25,000 sq.ft) is -0.2. Overall, there is both strong positive (blue color) and negative (red color) correlation between variables.
+Correlation matrix lists all the correlations between variables in numbers, so if you are interested of knowing some specific correlation you can easily check it from the table.   
+However, the corrlot option gives more visual way to check it out. You can see the strength of the correlation by checking the colors and the scaling below. The correlation coefficient lies between -1 and +1. 
+For example, correlation between crim (per capita crime rate by town) and zn (proportion of residential land zoned for lots over 25,000 sq.ft) is -0.2. Overall, there is both strong positive (blue color) and negative (red color) correlations between variables.
 
 
 Let's scale the dataset. In the scaling we subtract the column means from the corresponding columns and divide the difference with standard deviation (SD) as said in the DataCamp.
@@ -100,8 +103,8 @@ train <- boston_scaled[ind,] # 80% of the data is in train set
 test <- boston_scaled[-ind,] # 20% of the data is in test set
 ```
   
-Fitting the linear discriminant analysis (LDA) on the train set. LDA is a classification method.
-The target variable in LDA needs to be categorical, so crime rate (we made it into categorical before) is the target variable and all the other variables are predictors.  
+Fitting the linear discriminant analysis (LDA) on the train set. LDA is a classification method, you can find differences between groups.
+The target variable in LDA needs to be categorical, so crime rate (we made it into categorical earlier) is the target variable and all the other variables are predictors.  
 LDA is based on assumptions that variables are normally distributed and each variable has the same variance. I did the scaling to the variables so this should be OK.
 ```{r}
 lda.fit <- lda(crime ~ ., data = train)
@@ -110,10 +113,11 @@ lda.fit
   
 Prior probabilities of group: number of observations in the group divided by number of observations in the whole dataset.
 Group means: Mean value for every variable and class
+There are 3 linear discriminant, because the target variable has 4 classes and the number of linear discriminants is the amount of classes minus 1 --> 4-1=3.
 
 Proportion of trace is the between groups variance, here LD1 94% explains the between groups variance.
 
-I will draw the LDA biplot.
+I will draw the LDA biplot (scatterplot of the linear discriminants)
 ```{r}
 # the function for lda biplot arrows
 lda.arrows <- function(x, myscale = 1, arrow_heads = 0.1, color = "orange", tex = 0.75, choices = c(1,2)){
@@ -135,6 +139,9 @@ lda.arrows(lda.fit, myscale = 1)
 ```
   
 The arrows are drawn based on the coefficients.
+You can find 5 distinct classess. 
+Rad (index of accessibility to radial highways) somehow differs/has more variation from the rest of the yellow class. Also the green class is divided into two.
+Predictor variables are as arrows, so maybe then rad and zn are predictor variables(?). But the rad has the longest arrow so it impacts the most on the model.
 
 
 I will save the crime categories from the test set and then remove the categorical crime variable from the test dataset.  
@@ -156,6 +163,7 @@ table(correct = correct_classes, predicted = lda.pred$class)
   
 If I interpret this in a right way, the model can predict very well the high crime rates. But in low, med low and med high there is some misclassification. For example, 6 of the in total of 19 low crime rates is classified into med low, which is incorrect. All 19 should be predicted into low, if the model would work without any errors.  
 
+**Clustering**
 
 Now I should reload the Boston dataset and standardize/scale it.  
 I will calculate the distances (Euclidean and Manhattan) between observations.
@@ -174,17 +182,21 @@ dist_man <- dist(boston_scaled2, method = 'manhattan')
 summary(dist_man)
 
 ```
+Distances are totally different between these two distance methods. Euclidean (min=0.13, max=14.4) and Manhattan (min=0.27, max=48.9). Euclidean measures the straight distance between variables and Manhattan distance is not the shortest route, but the distance between points measured over the dimensions of the vectors.
+
 
 K-means is a clustering method. "It is an unsupervised method, that assigns observations to groups or clusters based on similarity of the objects."
-
+In clustering, you don't know the number of classes beforehand.
+"K-means calculates distances between centroids and datapoints."
 
 ```{r}
 # k-means clustering
-km <-kmeans(boston_scaled2, centers = 3)
+km <-kmeans(boston_scaled2, centers = 3) #let's take 3 centers
 # plot the scaled boston dataset with clusters
 pairs(boston_scaled2, col = km$cluster)
 
 ```
+From the plot, you can observe how the 3 clusters distribute between variables.
 
 Finding the best number of clusters:
 
@@ -208,6 +220,10 @@ pairs(Boston, col = km$cluster)
 ````
 
 Optimal number of clusters seems to be 2, because there the total within cluster sum of squares (WCSS) changes radically.
+
+
+**Learning diary**
+This weeks topic was quite demanding, I had no previous experience on discriminant analysis or clustering. I would have hoped better videos on how to interpret the plots.
 
 
 
