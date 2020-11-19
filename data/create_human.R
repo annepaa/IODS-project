@@ -3,6 +3,7 @@
 #Creating dataset human
 
 #Read the “Human development” and “Gender inequality” datas into R.
+library(tidyverse)
 
 hd <- read.csv("http://s3.amazonaws.com/assets.datacamp.com/production/course_2218/datasets/human_development.csv", stringsAsFactors = F)
 gii <- read.csv("http://s3.amazonaws.com/assets.datacamp.com/production/course_2218/datasets/gender_inequality.csv", stringsAsFactors = F, na.strings = "..")
@@ -22,24 +23,33 @@ summary(gii)
 colnames(hd)
 colnames(gii)
 
-#I should rename the variables, but I don't know yet how should I rename them.
+#I should rename the variables. I rename some.
+library(dplyr)
+gii=rename(gii, Edu2.F=Population.with.Secondary.Education..Female.)
+gii=rename(gii, Edu2.M=Population.with.Secondary.Education..Male.)
+
+#I check that I succeeded
+colnames(gii) #it seems to be working, names have changed
+#I continue, I rename more
+gii=rename(gii, LabF=Labour.Force.Participation.Rate..Female.)
+gii=rename(gii, LabM=Labour.Force.Participation.Rate..Male.)
+
+colnames(gii)
 
 #creating new variables
-var1 <- gii$Population.with.Secondary.Education..Female./gii$Population.with.Secondary.Education..Male.
-var1
+gii <-gii %>% mutate(var1=Edu2.F/Edu2.M)
+gii<- gii %>% mutate(var2=LabF/LabM)
 
-#the second one...
-var2<-gii$Labour.Force.Participation.Rate..Female./gii$Labour.Force.Participation.Rate..Male.
-summary(gii$var2)
-var2
-
-#by country???
-country<-c(gii$Country)
-country
 
 #merge
-human <- inner_join(var1, var2, by=country)
+human <- inner_join(hd, gii, by="Country")
 
-human
+colnames(human)
+summary(human)
+dim(human)
 
-#I have no idea how to do this, that did not work...
+#there is 195 observations and 19 variables, it should be correct now.
+
+#saving to data folder
+
+write.table(human,'C:/Users/silve/OneDrive - University of Eastern Finland/IODS-project 2020/IODS-project/data/human.txt')
