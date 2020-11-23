@@ -10,23 +10,115 @@ output: html_document
 ```{r}
 date()
 ```
+* 1
 I will read the dataset "human" from the internet link that was given to us.
 ```{r}
 human<-read.table("http://s3.amazonaws.com/assets.datacamp.com/production/course_2218/datasets/human2.txt",sep=",")
 colnames(human)
 
 ```
+Below are the explanations to the variables:
+"Country" = Country name
+
+Health and knowledge
+
+"GNI" = Gross National Income per capita
+"Life.Exp" = Life expectancy at birth
+"Edu.Exp" = Expected years of schooling 
+"Mat.Mor" = Maternal mortality ratio
+"Ado.Birth" = Adolescent birth rate
+
+Empowerment
+
+"Parli.F" = Percetange of female representatives in parliament
+"Edu2.F" = Proportion of females with at least secondary education
+"Edu2.M" = Proportion of males with at least secondary education
+"Labo.F" = Proportion of females in the labour force
+"Labo.M" " Proportion of males in the labour force
+
+"Edu2.FM" = Edu2.F / Edu2.M
+"Labo.FM" = Labo2.F / Labo2.M
+
 Let's check the summaries of the variables and show graphical overview of the data.
 ```{r}
 #summary
 summary(human)
+```
 
-#graphical overview, first I get the libraries
+```{r}
+#graphical overview, first I set the libraries
 library(GGally)
 library(dplyr)
 library(corrplot)
 ggpairs(human)
 cor(human)%>%corrplot()
+
+cor_matrix<-cor(human) %>% round(digits=2)
+cor_matrix
 ```
   
-Some variables have no correlation.
+Distributions of variables differ. Variables Edu2.FM, Labo.FM, Edu.Exp have the mean as most frequent values, as you can see from the plots, the peak is in the center. But then, for example, GNI and Mat.Mor are curved to the right, so they have less high values and more small values.
+
+The correlation between variables is quite small in many cases, for example GNI and Labo.FM have correlation -0.022 and  Parli.F and Edu2.FM 0.079. However, some variables are quite strongly correlated, such as Edu.Exp and Edu2.FM has the correlation 0.593. But no wonder, that expected years of schooling is positively correlated with Proportion of males/females with at least secondary education.
+
+* 2
+
+**Principal component analysis (PCA)**
+In PCA, the data is first transformed into a new pace with less number of dimensions.
+There will be new features, so called principal components: the 1st component is the one which describes the highest variance. The 2nd component is orthogonal to the 1st component and shows the maximum variability that is left after the 1st component. All principal component are **uncorrelated**. We can the choose first few principal components to describe our data; they capture the maximum amount of variation in the data.
+PCA assumes that features with larger variance are more important than those with smaller variance. That is why the data should be standardized.
+
+I will now do the PCA on unstandardized human data and plot the result.
+
+```{r}
+pca_human <- prcomp(human)
+biplot(pca_human, choices = 1:2, cex=c(0.8,1), col = c("grey40", "deeppink2"))
+```
+
+* 3
+Let's then standardize the human data and do the PCA again.
+
+```{r}
+human_std<-scale(human)
+
+pca_human2 <- prcomp(human_std)
+biplot(pca_human2, choices = 1:2, cex=c(0.8,1), col = c("grey40", "deeppink2"))
+```
+
+There is a clear difference between the PCA analysis that is done with unstandardized and standardized data. As I wrote previously, PCA assumes that features that has higher variance are more important, that is why scaling is important. GNI variable has e.g. the highest difference between min and max values, so I guess no wonder it stood out from the unstandardized plot so well.
+
+Those variables that are almost orthogonal to each other, such as Labo.FM and Ado.Birth, the correlation between those variables is close to zero (here it was 0.12). Explanation behind this could be, that men and women's labour status does not have an effect on how much babies are born for young mothers. I wonder, would the result change if the labour status would be only on men or only on women (now it is combination variable).
+
+Arrows that point to the same directions and are close to each other, the correlation is quite strong. Here Mat.Mor and Ado.Birth have the correlation of 0.76, so it is close to 1. It describes the phenomena that adolescents have an increased risk of death during pregnancy.
+
+* 4
+Let's draw another biplot on PCA, where I used the standardized human data.
+
+```{r}
+s <- summary(pca_human2)
+s
+# rounded percentages of variance captured by each PC
+pca_pr <- round(100*s$importance[2,], digits = 1) 
+pca_pr
+# create object pc_lab to be used as axis labels
+pc_lab <- paste0(names(pca_pr), " (", pca_pr, "%)")
+
+# draw a biplot
+biplot(pca_human2, cex = c(0.8, 1), col = c("grey40", "deeppink2"), xlab = pc_lab[1], ylab = pc_lab[2])
+```
+
+Here the 1st principal component captures more than 50% of the variability in the data and 2nd principal component bit over 15%.
+Those features that are pointing out to the same direction than the principal component, for example Ado.Birth is horizontal just like PC1, are contributing to that dimension the most. So Labo.FM and Parli.F are contributing to PC2. 
+
+
+* 5
+Multiple Correspondence Analysis
+
+```{r}
+install.packages("FactoMineR")
+library(FactoMineR)
+
+
+```
+
+
