@@ -110,15 +110,73 @@ biplot(pca_human2, cex = c(0.8, 1), col = c("grey40", "deeppink2"), xlab = pc_la
 Here the 1st principal component captures more than 50% of the variability in the data and 2nd principal component bit over 15%.
 Those features that are pointing out to the same direction than the principal component, for example Ado.Birth is horizontal just like PC1, are contributing to that dimension the most. So Labo.FM and Parli.F are contributing to PC2. 
 
-
 * 5
 Multiple Correspondence Analysis
+Let's download the tea dataset from FactoMineR.
 
 ```{r}
-install.packages("FactoMineR")
+#install.packages("FactoMineR")
 library(FactoMineR)
+data("tea")
+str(tea)
+dim(tea)
+```
 
+The variables in the tea data seem to be categorical, which is good because MCA analyses the relationship patterns of categorical variables. There is 300 observations and 36 variables, somewhat big data.  
+
+```{r}
+library(ggplot2)
+library(tidyr)
+# visualize the dataset
+gather(tea) %>% ggplot(aes(value)) + facet_wrap("key", scales = "free") + geom_bar()
+```
+
+I will do the MCA to a certain columns of the tea data
+
+```{r}
+# column names to keep in the dataset
+keep_columns <- c("Tea", "How", "how", "sugar", "where", "lunch")
+
+# select the 'keep_columns' to create a new dataset
+tea_time <- select(tea, one_of(keep_columns))
+
+gather(tea_time) %>% ggplot(aes(value)) + facet_wrap("key", scales = "free") + geom_bar() + theme(axis.text.x = element_text(angle = 45, hjust = 1, size = 8))
 
 ```
+
+Now I have the tea_time dataset.
+
+```{r}
+# multiple correspondence analysis
+mca <- MCA(tea_time, graph = FALSE)
+# summary of the model
+summary(mca)
+```
+  
+Eigenvalues in the MCA summary represent the variances and the percentages of the variance was retain by each dimension. Here you can see, that the dimension 1 covers the highest amount of variance of all the 11 dimensions, which is 15.24%
+
+Then there are 10 fist individuals coordinates, contribution(%) to the dimensions and the squared correlations of the dimensions.
+
+Categories include the coordinates of the variable categories, contribution (%), squared correlations and v.test value. In v.test, if the value is below or above 1.96, the coordinate is significantly different from zero, and here most of the values are below or above 1.96.
+
+In categorical variables section, there is squared correlation  between each variables and the dimension. If the this value is close to 1, then there is a strong link between the variable and the dimension. here "how" and "where" are quite close to 1, so they have strong link with dimension 1.
+
+
+
+```{r}
+# visualize MCA
+plot(mca, invisible=c("ind"), habillage = "quali")
+```
+
+In the biplot, variables are drawn on the first two dimensions.  
+Like I wrote before, dimension 1 covers only bit over 15% of the variance. 
+Biplot describes the possible variable patterns so here you can see that unpackaged and tea shop are far away from the main center, but somewhat close to each other, so they are more similar together. green and other form their own individual groups and are different from all the other variables. However, most of the variables are packed together in the middle. 
+
+
+
+**Learning diary**  
+This weeks assignment was easier to conduct in R than e.g. logistic regression... but of course the interpretation is always a bit hard. I had no previous experience with these techniques. There is still one more exercise left! I have gained understanding what is the basic idea how R works and what kind of analyses can be done.
+
+
 
 
