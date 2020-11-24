@@ -127,18 +127,17 @@ The variables in the tea data seem to be categorical, which is good because MCA 
 ```{r}
 library(ggplot2)
 library(tidyr)
-# visualize the dataset
+#visualize the dataset
 gather(tea) %>% ggplot(aes(value)) + facet_wrap("key", scales = "free") + geom_bar()
 ```
 
 I will do the MCA to a certain columns of the tea data
-
 ```{r}
-# column names to keep in the dataset
+#column names to keep in the dataset
 keep_columns <- c("Tea", "How", "how", "sugar", "where", "lunch")
 
-# select the 'keep_columns' to create a new dataset
-tea_time <- select(tea, one_of(keep_columns))
+#select the 'keep_columns' to create a new dataset
+tea_time <- dplyr::select(tea, one_of(keep_columns))
 
 gather(tea_time) %>% ggplot(aes(value)) + facet_wrap("key", scales = "free") + geom_bar() + theme(axis.text.x = element_text(angle = 45, hjust = 1, size = 8))
 
