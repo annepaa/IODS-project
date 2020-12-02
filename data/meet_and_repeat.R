@@ -54,7 +54,7 @@ glimpse(RATSL)#176 rows, 5 columns
 #looking the new datasets.
 #now the BRPSL and RATSL are in long form.
 summary(BPRSL)
-#there were in BPRS 40 observations, 11 variables but in long form,but now all the observations are listed below to each other
+#there were in BPRS 40 observations, 11 variables but in long form, now all the observations are listed below to each other
 #there should be 40*9(0+8weeks)=360 rows, as there is at the moment
 summary(RATSL)
 #there were in RATS 16 observations, 13 variables, but now in long form:
@@ -82,6 +82,11 @@ ggplot(RATSL, aes(x = Time, y = Weight, group = ID)) +
   scale_x_continuous(name = "Time (days)", breaks = seq(0, 60, 10)) +
   scale_y_continuous(name = "Weight (grams)") +
   theme(legend.position = "top")
+
+#It is important to have the data in long form, so all the observations per person are listed in separate rows one below another.
+#This is because the observations are stemming from repeated measures in the same person, 
+#there is probably correlation within subject. So the observations are not independent.
+#in order to do the analyses with longitudinal data, making the data into long form is crucial.
 
 #lets save the datasets in long form to data folder
 write.table(BPRSL,"C:/Users/silve/OneDrive - University of Eastern Finland/IODS-project 2020/IODS-project/data/BPRSL.txt")
